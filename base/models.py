@@ -22,7 +22,7 @@ class Vendor(models.Model):
 class Purchase(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE) # OTM
     price = models.FloatField()
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE) # OTM
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True) # OTM
     quantity = models.IntegerField()
 
 class Customer(models.Model):
@@ -32,5 +32,5 @@ class Customer(models.Model):
 class Sell(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE) #OTM
     price = models.FloatField()
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE) #OTM
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True) #OTM
     quantity = models.IntegerField() 
