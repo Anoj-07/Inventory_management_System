@@ -11,26 +11,26 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     stock = models.IntegerField()
-    type = models.ForeignKey(ProductType)  # OTM
+    type = models.ForeignKey(ProductType, on_delete=models.SET_NULL, null=True)  # OTM
     departments = models.ManyToManyField(Department) #MTM
 
 class Vendor(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
-    email = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100)
 
 class Purchase(models.Model):
-    product = models.ForeignKey(Product) # OTM
+    product = models.ForeignKey(Product, on_delete=models.CASCADE) # OTM
     price = models.FloatField()
-    vendor = models.ForeignKey(Vendor) # OTM
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE) # OTM
     quantity = models.IntegerField()
 
 class Customer(models.Model):
     name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=20)
 
 class Sell(models.Model):
-    product = models.ForeignKey(Product) #OTM
+    product = models.ForeignKey(Product, on_delete=models.CASCADE) #OTM
     price = models.FloatField()
-    customer = models.ForeignKey(Customer) #OTM
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE) #OTM
     quantity = models.IntegerField() 
