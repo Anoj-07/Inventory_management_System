@@ -23,5 +23,4 @@ urlpatterns = [
     path('product/types/', ProductTypeApiView.as_view({'get': 'list', 'post': 'create'})),
     path('product/types/<int:pk>/', ProductTypeApiView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
     path('department/types/', DepartmentTypeApiView.as_view({'get': 'list', 'post': 'create'})),
-    path('department/types/<int:pk>/', DepartmentTypeApiView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
 ]
