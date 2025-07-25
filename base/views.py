@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import ProductType, Department
+from .models import ProductType, Department, Vendor, Product
 from rest_framework.viewsets import ModelViewSet, GenericViewSet # Modelviewset is used for already defiend CRUD operations and GenericViewSet is used for make own CRUD operations
 from rest_framework.response import Response
-from .serializers import ProductTypesSerializer, DepartmentTypesSerializer
+from .serializers import ProductTypesSerializer, DepartmentTypesSerializer, VendorSerializer, ProductSerializer
 from rest_framework import status
 # Create your views here.
 # class  based views for ProductType
@@ -67,3 +67,75 @@ class DepartmentTypeApiView(GenericViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VendorApiView(GenericViewSet):
+    queryset = Vendor.objects.all()
+    serializer_class = VendorSerializer
+
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True): # It will validate the serializer data
+            serializer.save() # It will save the serializer data to the database
+            return Response(serializer.data, status=201) # It will return the serialized data and status code
+        else:
+            return Response(serializer.errors, status=400)
+    
+    def update(self, request, pk):
+        query_set = self.get_object()
+
+        serializer = self.get_serializer(query_set, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def retrive(self, request, pk):
+        queryset = self.get_object()
+
+        serilizer = self.get_serializer(queryset)
+        return Response(serilizer.data)
+    
+    def destory(self, request, pk):
+        queryset = self.get_object()
+        queryset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def partial_update(self, request, pk):
+        query_set = self.get_object()
+        serilizer = self.get_serializer(query_set, data=request.data, partial=True)
+
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductApiView(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    # def list(self, request):
+    #     pass
+    
+    # def create(self, request):
+    #     pass
+    
+    # def update(self, request, pk):
+    #     pass
+    
+    # def retrieve(self, request, pk):
+    #     pass
+    
+    # def destroy(self, request, pk):
+    #     pass
+    
+    # def partial_update(self, request, pk):
+    #     pass

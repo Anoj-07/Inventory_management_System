@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProductType, Department
+from .models import ProductType, Department, Vendor, Product
 
 class ProductTypesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,3 +19,17 @@ class DepartmentTypesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = '__all__'
+
+class VendorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vendor
+        fields = '__all__'
+
+class ProductSerializer(serializers.ModelSerializer):
+    type = serializers.SlugRelatedField(slug_field='name', queryset=ProductType.objects.all())
+    departments = serializers.SlugRelatedField(many=True, slug_field='name', queryset=Department.objects.all())
+
+    class Meta:
+        model = Product
+        fields = '__all__'
+
