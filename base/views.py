@@ -2,14 +2,17 @@ from django.shortcuts import render
 from .models import ProductType, Department, Vendor, Product
 from rest_framework.viewsets import ModelViewSet, GenericViewSet # Modelviewset is used for already defiend CRUD operations and GenericViewSet is used for make own CRUD operations
 from rest_framework.response import Response
-from .serializers import ProductTypesSerializer, DepartmentTypesSerializer, VendorSerializer, ProductSerializer
+from .serializers import ProductTypesSerializer, DepartmentTypesSerializer, VendorSerializer, ProductSerializer, UserSerializer
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.models import User
 # Create your views here.
 # class  based views for ProductType
 
 class ProductTypeApiView(ModelViewSet):
     queryset = ProductType.objects.all()
     serializer_class = ProductTypesSerializer
+    # permission_classes = [IsAuthenticated]  # permissions required for this view (Authentication and Authorization )
 
 class DepartmentTypeApiView(GenericViewSet):
     queryset = Department.objects.all() 
@@ -121,3 +124,18 @@ class VendorApiView(GenericViewSet):
 class ProductApiView(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+class UserApiView(GenericViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = []  # No permissions required for this view (Authentication and Authorization ) # it don't take defult permission class from settings.py
+
+    def register(self, request):
+
+        serializer = self.get_serializer(data=request.data) # It will serialize the request data for JSON serialization object to JSON
+
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
