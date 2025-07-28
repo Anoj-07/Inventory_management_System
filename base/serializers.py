@@ -45,3 +45,9 @@ class UserSerializer(serializers.ModelSerializer):
         hash_password = make_password(raw_password) # hasing user's password using make_password function
         validated_data['password'] = hash_password # Assigning hashed password as a validated data
         return super().create(validated_data) # Passing the validated data to the parent class's create method to save the user instance
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+        

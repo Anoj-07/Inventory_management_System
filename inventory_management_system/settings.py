@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base', # base app 1
     'rest_framework',  # Django REST Framework for API development
+    'rest_framework.authtoken',  # Token authentication for REST Framework
 ]
 
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -127,5 +129,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES' : [
         "rest_framework.permissions.IsAuthenticated",  # Default permission class for all views 
-    ]
+        ],
+    "DEFAULT_AUTHENTICATION_CLASSES" : [
+        'rest_framework.authentication.TokenAuthentication'
+        ]
 }

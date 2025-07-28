@@ -2,10 +2,12 @@ from django.shortcuts import render
 from .models import ProductType, Department, Vendor, Product
 from rest_framework.viewsets import ModelViewSet, GenericViewSet # Modelviewset is used for already defiend CRUD operations and GenericViewSet is used for make own CRUD operations
 from rest_framework.response import Response
-from .serializers import ProductTypesSerializer, DepartmentTypesSerializer, VendorSerializer, ProductSerializer, UserSerializer
+from .serializers import ProductTypesSerializer, DepartmentTypesSerializer, VendorSerializer, ProductSerializer, UserSerializer, LoginSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 # Create your views here.
 # class  based views for ProductType
 
@@ -137,5 +139,21 @@ class UserApiView(GenericViewSet):
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def login(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid(): # Validate whether user informatiioin being sent or not
+            username = request.data.get('username')
+            password = request.data.get('password')
+
+            user = authenticate(username=username, password=password)  # Authenticate the user # Passing username and password in authentication to check whether it matches with any user or not if mathched it returns user object data if not it returns None
+            if user == None:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED) # we send data in dictionary format and it will be converted to JSON by Response class and you cannot return object directly
+            else:
+               token,_ =  Token.objects.get_or_create(user=user)  # It will get already having token or create new if there is none # it will give in tuple (get_or_create)
+               # token,_ here it is like a,b = (1, 3)
+               return Response({'token':token.key})
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
