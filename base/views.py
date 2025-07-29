@@ -132,6 +132,7 @@ class UserApiView(GenericViewSet):
     serializer_class = UserSerializer
     permission_classes = []  # No permissions required for this view (Authentication and Authorization ) # it don't take defult permission class from settings.py
 
+# For register
     def register(self, request):
 
         serializer = self.get_serializer(data=request.data) # It will serialize the request data for JSON serialization object to JSON
@@ -141,7 +142,7 @@ class UserApiView(GenericViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+# for Login 
     def login(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid(): # Validate whether user informatiioin being sent or not
