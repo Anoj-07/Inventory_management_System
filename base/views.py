@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from .ai import create_description_with_ai
 # Create your views here.
 # class  based views for ProductType
 
@@ -126,6 +127,20 @@ class VendorApiView(GenericViewSet):
 class ProductApiView(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    # API for Description Generator API 
+    def generate_description(self, request):
+        product_name = request.data.get("name")
+
+        if not product_name:
+            return Response({"error": "Product name is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            description = create_description_with_ai(product_name)
+            return Response({"name": product_name, "generated_description": description}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class UserApiView(GenericViewSet):
     queryset = User.objects.all()

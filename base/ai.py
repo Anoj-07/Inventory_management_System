@@ -9,25 +9,18 @@ def create_description_with_ai(product_name):
         messages=[
         {
             "role": "system",
-            "content": "Act as a Description generator by product name for my IMS system. It should be a precise description not any extra thing"
+            "content": "Act as a Description generator by product name."
         },
         {
             "role": "user",
-            "content": "laptop"
+            "content": f" give me a breif description according for product name {product_name} It should be a precise description not any extra thing"
         },
-        {
-            "role": "assistant",
-            "content": "Portable personal computer designed for mobile use, typically featuring a compact keyboard, display, and processing components."
-        },
-        {
-            "role": "user",
-            "content": ""
-        }
         ],
         temperature=1,
         max_completion_tokens=1024,
         top_p=1,
         stream=False,
+        # response_format={"type": "json_object"},
         stop=None,
     )
 

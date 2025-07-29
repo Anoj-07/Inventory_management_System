@@ -29,5 +29,6 @@ urlpatterns = [
     path('product/', ProductApiView.as_view({'get': 'list', 'post': 'create'})),
     path('product/<int:pk>/', ProductApiView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy', 'patch': 'partial_update'})),
     path('register/', UserApiView.as_view({'post': 'register'})),
-    path('login/', UserApiView.as_view({'post': 'login'}))
+    path('login/', UserApiView.as_view({'post': 'login'})),
+    path('generate-ai/', ProductApiView.as_view({'post' : 'generate_description'}))
 ]
