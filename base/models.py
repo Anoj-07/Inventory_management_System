@@ -30,7 +30,7 @@ class Customer(models.Model):
     phone = models.CharField(max_length=20)
 
 class Sell(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE) #OTM
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sell') #OTM
     price = models.FloatField()
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True) #OTM
     quantity = models.IntegerField() 

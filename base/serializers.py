@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProductType, Department, Vendor, Product
+from .models import ProductType, Department, Vendor, Product, Sell
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
 
@@ -28,8 +28,8 @@ class VendorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
-    type = serializers.SlugRelatedField(slug_field='name', queryset=ProductType.objects.all())
-    departments = serializers.SlugRelatedField(many=True, slug_field='name', queryset=Department.objects.all())
+    # type = serializers.SlugRelatedField(slug_field='name', queryset=ProductType.objects.all())
+    # departments = serializers.SlugRelatedField(many=True, slug_field='name', queryset=Department.objects.all())
 
     class Meta:
         model = Product
@@ -50,4 +50,9 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
+
+class SellSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sell
+        fields = '__all__'
         
