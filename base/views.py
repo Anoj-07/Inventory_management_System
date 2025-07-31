@@ -162,6 +162,7 @@ class ProductApiView(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    # Best selling 
     def best_selling(self, request):
         queryset = (
             Product.objects.all()
@@ -170,7 +171,7 @@ class ProductApiView(ModelViewSet):
                     "sell__quantity"
                 )  # to join sell and product and sell Quantity
             )
-            .order_by("-total_sell_quantity")
+            .order_by("-stock")
         )  # kunai pani aauta field thapi dinxa annotate method le
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
