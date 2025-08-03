@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import ProductType, Department, Vendor, Product, Sell
+from .models import ProductType, Department, Vendor, Product, Rating, Sell, Purchase
 from rest_framework.viewsets import (
     ModelViewSet,
     GenericViewSet,
@@ -13,6 +13,8 @@ from .serializers import (
     UserSerializer,
     LoginSerializer,
     SellSerializer,
+    PurchaseSerializer,
+    RatingSerializer,
 )
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -157,12 +159,17 @@ class SellApiView(ModelViewSet):
     serializer_class = SellSerializer
 
 
+class PurchaseApiView(ModelViewSet):
+    queryset = Purchase.objects.all()
+    serializer_class = PurchaseSerializer
+
+
 class ProductApiView(ModelViewSet):
     # queryset = Product.objects.all().order_by('-stock') # descending according to stock (-) and with out (-) stock ascending order
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-    # Best selling 
+    # Best selling
     def best_selling(self, request):
         queryset = (
             Product.objects.all()
@@ -171,8 +178,18 @@ class ProductApiView(ModelViewSet):
                     "sell__quantity"
                 )  # to join sell and product and sell Quantity
             )
-            .order_by("-stock")
+            .order_by("-total_sell_quantity")
         )  # kunai pani aauta field thapi dinxa annotate method le
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    # most purchased
+    def most_purchased(self, request):
+        queryset = (
+            Product.objects.all()
+            .annotate(total_purchase_quantity=Sum("purchase__quantity"))
+            .order_by("-total_purchase_quantity")
+        )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -243,3 +260,8 @@ class UserApiView(GenericViewSet):
                 return Response({"token": token.key})
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RatingApiView(ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
