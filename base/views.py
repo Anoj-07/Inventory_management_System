@@ -17,12 +17,12 @@ from .serializers import (
     RatingSerializer,
 )
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from .ai import create_description_with_ai
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 
 # Create your views here.
 # class  based views for ProductType
@@ -168,6 +168,7 @@ class ProductApiView(ModelViewSet):
     # queryset = Product.objects.all().order_by('-stock') # descending according to stock (-) and with out (-) stock ascending order
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [DjangoModelPermissions] # this is for permission 
 
     # Best selling
     def best_selling(self, request):
@@ -190,6 +191,12 @@ class ProductApiView(ModelViewSet):
             .annotate(total_purchase_quantity=Sum("purchase__quantity"))
             .order_by("-total_purchase_quantity")
         )
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    # rating
+    def top_rated(self, request):
+        queryset = Product.objects.all().annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

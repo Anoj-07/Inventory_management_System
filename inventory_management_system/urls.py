@@ -70,6 +70,7 @@ urlpatterns = [
 
     path("product/", ProductApiView.as_view({"get": "list", "post": "create"})),
     path("best/selling/product/", ProductApiView.as_view({"get": "best_selling"})),
+    path('top/rated/products/', ProductApiView.as_view({'get': 'top_rated'})),
     path("product/<int:pk>/",
         ProductApiView.as_view(
             {
@@ -99,9 +100,9 @@ urlpatterns = [
     ),
 
 
-    path("rating/", SellApiView.as_view({"get": "list", "post": "create"})),
+    path("rating/", RatingApiView.as_view({"get": "list", "post": "create"})),
     path("rating/<int:pk>/",
-        SellApiView.as_view(
+        RatingApiView.as_view(
             {
                 "get": "retrieve",
                 "put": "update",
@@ -110,6 +111,7 @@ urlpatterns = [
             }
         ),
     ),
+
 
 
     path("purchase/", PurchaseApiView.as_view({"get": "list", "post": "create"})),

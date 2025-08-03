@@ -36,6 +36,6 @@ class Sell(models.Model):
     quantity = models.IntegerField() 
 
 class Rating(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE) #OTM
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='ratings') #OTM
     rating = models.IntegerField() 
     comment = models.CharField(null=True)
