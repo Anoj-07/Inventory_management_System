@@ -23,6 +23,7 @@ from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from .ai import create_description_with_ai
 from django.db.models import Sum, Avg
+from rest_framework.exceptions import APIException
 
 # Create your views here.
 # class  based views for ProductType
@@ -170,18 +171,26 @@ class ProductApiView(ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [DjangoModelPermissions]  # this is for permission
 
-    # TO Generte Description from API
-    def perform_create(
-        self, serializer
-    ):  # perform_create() is a hook method that DRF provides in class-based views (like ModelViewSet), which is called automatically when .create() is called on the view (i.e., during a POST request).
+    """
+    => (perform_create() is not an API view method that returns responses.)
+    # perform_create() is a hook method that DRF provides in class-based views (like ModelViewSet), which is called automatically when .create() is called on the view (i.e., during a POST request).
+    """
+    # TO Generte Description form AI
+    def perform_create(self, serializer):  
         product_name = serializer.validated_data.get("name")
         description = serializer.validated_data.get("description", None)
 
         # 💡 If description is not provided, generate it
-        if not description:
-            description = create_description_with_ai(product_name)
+        try:
+            if not description:
+                description = create_description_with_ai(product_name)
 
-        serializer.save(description=description)
+            serializer.save(description=description)
+
+        except Exception as e:
+        # Raise DRF exception, which sends proper HTTP 500 response
+            raise APIException(f"AI generation failed: {str(e)}")
+
 
     # Best selling
     def best_selling(self, request):
