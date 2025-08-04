@@ -39,6 +39,9 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+        extra_kwargs = {
+            'description': {'required': False, 'allow_blank': True}
+        }
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

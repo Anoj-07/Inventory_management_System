@@ -168,7 +168,20 @@ class ProductApiView(ModelViewSet):
     # queryset = Product.objects.all().order_by('-stock') # descending according to stock (-) and with out (-) stock ascending order
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [DjangoModelPermissions] # this is for permission 
+    permission_classes = [DjangoModelPermissions]  # this is for permission
+
+    # TO Generte Description from API
+    def perform_create(
+        self, serializer
+    ):  # perform_create() is a hook method that DRF provides in class-based views (like ModelViewSet), which is called automatically when .create() is called on the view (i.e., during a POST request).
+        product_name = serializer.validated_data.get("name")
+        description = serializer.validated_data.get("description", None)
+
+        # 💡 If description is not provided, generate it
+        if not description:
+            description = create_description_with_ai(product_name)
+
+        serializer.save(description=description)
 
     # Best selling
     def best_selling(self, request):
@@ -193,33 +206,53 @@ class ProductApiView(ModelViewSet):
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-    
+
     # rating
     def top_rated(self, request):
-        queryset = Product.objects.all().annotate(avg_rating=Avg('ratings__rating')).order_by('-avg_rating')
+        queryset = (
+            Product.objects.all()
+            .annotate(avg_rating=Avg("ratings__rating"))
+            .order_by("-avg_rating")
+        )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    # API for Description Generator API
-    def generate_description(self, request):
-        product_name = request.data.get("name")
+    # def generate_description(self, request):
+    #     product_id = request.data.get("id")
 
-        if not product_name:
-            return Response(
-                {"error": "Product name is required."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+    #     if not product_id:
+    #         return Response(
+    #             {"error": "Product ID is required."},
+    #             status=status.HTTP_400_BAD_REQUEST,
+    #         )
 
-        try:
-            description = create_description_with_ai(product_name)
-            return Response(
-                {"name": product_name, "generated_description": description},
-                status=status.HTTP_200_OK,
-            )
-        except Exception as e:
-            return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+    #     try:
+    #         # Fetch the product
+    #         product = Product.objects.get(id=product_id)
+
+    #         # Use the AI function to generate a description based on product name
+    #         generated_description = create_description_with_ai(product.name)
+
+    #         # Save the generated description to the product
+    #         product.description = generated_description
+    #         product.save()
+
+    #         return Response({
+    #             "id": product.id,
+    #             "name": product.name,
+    #             "generated_description": generated_description,
+    #             "message": "Product description updated successfully"
+    #         }, status=status.HTTP_200_OK)
+
+    #     except Product.DoesNotExist:
+    #         return Response(
+    #             {"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND
+    #         )
+
+    #     except Exception as e:
+    #         return Response(
+    #             {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+    #         )
 
 
 class UserApiView(GenericViewSet):
