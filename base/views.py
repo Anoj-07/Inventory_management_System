@@ -3,6 +3,7 @@ from .models import ProductType, Department, Vendor, Product, Rating, Sell, Purc
 from rest_framework.viewsets import (
     ModelViewSet,
     GenericViewSet,
+    ReadOnlyModelViewSet
 )  # Modelviewset is used for already defiend CRUD operations and GenericViewSet is used for make own CRUD operations
 from rest_framework.response import Response
 from .serializers import (
@@ -15,10 +16,11 @@ from .serializers import (
     SellSerializer,
     PurchaseSerializer,
     RatingSerializer,
+    GroupSerializer
 )
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, DjangoModelPermissions
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from .ai import create_description_with_ai
@@ -309,6 +311,10 @@ class UserApiView(GenericViewSet):
                 return Response({"token": token.key})
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class GroupApiView(ReadOnlyModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 
 class RatingApiView(ModelViewSet):

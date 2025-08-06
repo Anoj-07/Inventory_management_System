@@ -26,6 +26,7 @@ from base.views import (
     SellApiView,
     PurchaseApiView,
     RatingApiView,
+    GroupApiView
 )
 
 urlpatterns = [
@@ -129,4 +130,6 @@ urlpatterns = [
 
 
     path("generate-ai/", ProductApiView.as_view({"post": "generate_description"})),
+
+    path("groups/", GroupApiView.as_view({"get": "list"})),
 ]

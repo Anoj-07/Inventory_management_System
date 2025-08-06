@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import ProductType, Department, Vendor, Product, Sell, Purchase, Rating
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.hashers import make_password
 
 class ProductTypesSerializer(serializers.ModelSerializer):
@@ -43,10 +43,15 @@ class ProductSerializer(serializers.ModelSerializer):
             'description': {'required': False, 'allow_blank': True}
         }
 
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['id', 'name']
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'password', 'email', 'first_name', 'last_name']
+        fields = ['username', 'password', 'groups', 'email', 'first_name', 'last_name']
     
     def create(self, validated_data):
         raw_password = validated_data.pop('password') # remove and assigned password key and value which user sent and validated
