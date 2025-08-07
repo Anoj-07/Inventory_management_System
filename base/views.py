@@ -161,10 +161,75 @@ class SellApiView(ModelViewSet):
     queryset = Sell.objects.all()
     serializer_class = SellSerializer
 
+    # Override perform_create to update stock after selling
+    def perform_create(self, serializer):
+        # Save the Sell object first
+        sell_instance = serializer.save()
+
+        # Get the product related to this sell
+        product = sell_instance.product  
+        sell_quantity = sell_instance.quantity  
+
+        # Check if enough stock is available before selling
+        if product.stock < sell_quantity:
+            raise APIException("Not enough stock available to sell!")
+
+        # Decrease stock after sale
+        product.stock -= sell_quantity
+        product.save()
+
+    # Override perform_update to handle stock changes if quantity is updated
+    def perform_update(self, serializer):
+        old_instance = self.get_object()  
+        old_quantity = old_instance.quantity  
+
+        sell_instance = serializer.save()
+        new_quantity = sell_instance.quantity  
+
+        product = sell_instance.product  
+
+        # Adjust stock based on quantity change
+        quantity_diff = new_quantity - old_quantity
+
+        if quantity_diff > 0:  # Selling more
+            if product.stock < quantity_diff:
+                raise APIException("Not enough stock to increase sale quantity!")
+            product.stock -= quantity_diff
+        else:  # Selling less (return case)
+            product.stock += abs(quantity_diff)
+
+        product.save()
+
 
 class PurchaseApiView(ModelViewSet):
     queryset = Purchase.objects.all()
     serializer_class = PurchaseSerializer
+
+    # Override perform_create to increase stock after purchase
+    def perform_create(self, serializer):
+        purchase_instance = serializer.save()
+        product = purchase_instance.product
+        purchase_quantity = purchase_instance.quantity
+
+        # Increase stock after purchase
+        product.stock += purchase_quantity
+        product.save()
+
+    # Override perform_update to handle quantity changes
+    def perform_update(self, serializer):
+        old_instance = self.get_object()
+        old_quantity = old_instance.quantity
+
+        purchase_instance = serializer.save()
+        new_quantity = purchase_instance.quantity
+
+        product = purchase_instance.product
+
+        # To Adjust stock
+        quantity_diff = new_quantity - old_quantity
+        product.stock += quantity_diff
+        product.save()
+
 
 
 class ProductApiView(ModelViewSet):
