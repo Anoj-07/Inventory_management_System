@@ -44,6 +44,7 @@ class DepartmentTypeApiView(GenericViewSet):
     # Custom methods for DepartmentTypeApiView
     def list(self, request):
         queryset = self.get_queryset()  # It will get all the objects from the database
+        # filter_queryset = self.filter_queryset(queryset)  # It will filter the queryset based on the request data
         serializer = self.get_serializer(
             queryset, many=True
         )  # It will serialize the queryset for JSON serialization object to JSON
@@ -237,7 +238,8 @@ class ProductApiView(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [DjangoModelPermissions]  # this is for permission
-
+    filterset_fields = ['type', 'department']  # This is for filtering the queryset based on type and departments
+    search_fields = ['name', 'description']  # This is for searching the queryset based on name and description
     """
     => (perform_create() is not an API view method that returns responses.)
     # perform_create() is a hook method that DRF provides in class-based views (like ModelViewSet), which is called automatically when .create() is called on the view (i.e., during a POST request).

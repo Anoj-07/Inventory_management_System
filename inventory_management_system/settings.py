@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'base', # base app 1
     'rest_framework',  # Django REST Framework for API development
     'rest_framework.authtoken',  # Token authentication for REST Framework
+    'django_filters',  # Django Filter for filtering support in DRF
 ]
 
 MIDDLEWARE = [
@@ -134,6 +135,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",  # Default permission class for all views 
         ],
     "DEFAULT_AUTHENTICATION_CLASSES" : [
-        'rest_framework.authentication.TokenAuthentication'
-        ]
+        'rest_framework.authentication.TokenAuthentication'],  # Token authentication for API views
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend', 'rest_framework.filters.SearchFilter'],    
 }
